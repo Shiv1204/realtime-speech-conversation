@@ -1,0 +1,7 @@
+speechrecognition
+pyaudio
+gtts
+requests
+playsound
+langchain
+openai
