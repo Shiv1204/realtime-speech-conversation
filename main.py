@@ -3,21 +3,24 @@ from utils.text_to_speech import real_time_text_to_speech
 from utils.conversation import generate_response
 
 def main():
-    print("Real-Time Speech Conversation System with LangChain")
-    print("Speak into the microphone to start the conversation.")
+    print("Conversational AI (real-time speech)")
     print("Press Ctrl+C to exit.")
+
+    history = []
 
     try:
         while True:
-            # Step 1: Convert speech to text
+            # Step 1: Speech to text
             user_input = real_time_speech_to_text()
             print(f"User: {user_input}")
+            history.append(("User", user_input))
 
-            # Step 2: Generate a response using LangChain
-            response = generate_response(user_input)
+            # Step 2: Generate response with history
+            response = generate_response(history, user_input)
             print(f"Assistant: {response}")
+            history.append(("Assistant", response))
 
-            # Step 3: Convert response to speech
+            # Step 3: Text to speech
             real_time_text_to_speech(response)
 
     except KeyboardInterrupt:

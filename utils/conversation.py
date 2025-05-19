@@ -3,24 +3,19 @@ from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain
 import os
 
-# Set your OpenAI API key (or Groq API key if supported by LangChain)
-os.environ["OPENAI_API_KEY"] = "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"
+os.environ["OPENAI_API_KEY"] = "YOUR_OPENAI_API_KEY"  # Or your Groq key if supported
 
-def generate_response(prompt):
-    """Generate a response using LangChain."""
-    # Define the prompt template
-    template = """
-    You are a helpful assistant. Respond to the following prompt:
-    {prompt}
-    """
-    prompt_template = PromptTemplate(input_variables=["prompt"], template=template)
+def generate_response(history, user_input):
+    """Generate a conversational response using LangChain."""
+    # Combine history into a single prompt
+    conversation = ""
+    for speaker, text in history:
+        conversation += f"{speaker}: {text}\n"
+    conversation += f"User: {user_input}\nAssistant:"
 
-    # Initialize the LLM (OpenAI or Groq if supported)
+    template = "{conversation}"
+    prompt_template = PromptTemplate(input_variables=["conversation"], template=template)
     llm = OpenAI(temperature=0.7)
-
-    # Create the LLM chain
     chain = LLMChain(llm=llm, prompt=prompt_template)
-
-    # Generate the response
-    response = chain.run(prompt)
-    return response
+    response = chain.run(conversation=conversation)
+    return response.strip()
