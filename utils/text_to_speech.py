@@ -1,14 +1,27 @@
-from gtts import gTTS
-from playsound import playsound
 import os
+from google.cloud import texttospeech
+import tempfile
+from playsound import playsound
 
-def real_time_text_to_speech(text):
-    """Convert text to speech and play it in real-time."""
+def google_cloud_text_to_speech(text, lang="en-US", voice_name="en-US-Wavenet-D"):
+    """Convert text to speech using Google Cloud Text-to-Speech and play it."""
     try:
-        tts = gTTS(text=text, lang='en')
-        output_file = "audio/response.mp3"
-        tts.save(output_file)
-        playsound(output_file)
-        os.remove(output_file)  # Clean up the temporary file
+        client = texttospeech.TextToSpeechClient()
+        synthesis_input = texttospeech.SynthesisInput(text=text)
+        voice = texttospeech.VoiceSelectionParams(
+            language_code=lang,
+            name=voice_name
+        )
+        audio_config = texttospeech.AudioConfig(
+            audio_encoding=texttospeech.AudioEncoding.MP3
+        )
+        response = client.synthesize_speech(
+            input=synthesis_input, voice=voice, audio_config=audio_config
+        )
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as out:
+            out.write(response.audio_content)
+            temp_file = out.name
+        playsound(temp_file)
+        os.remove(temp_file)
     except Exception as e:
-        print(f"Error in text-to-speech conversion: {e}")
+        print(f"TTS Error: {e}")
